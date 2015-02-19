@@ -5,6 +5,8 @@ VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AnticrastinateCore", "AnticrastinateCore\AnticrastinateCore.csproj", "{8C420FCC-82E3-47F1-B0D1-1DDA7C61DBF7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProgramBlocker", "ProgramBlocker\ProgramBlocker.csproj", "{DFB5F077-1C6B-4B72-A24A-949803234EE1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{8C420FCC-82E3-47F1-B0D1-1DDA7C61DBF7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8C420FCC-82E3-47F1-B0D1-1DDA7C61DBF7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8C420FCC-82E3-47F1-B0D1-1DDA7C61DBF7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DFB5F077-1C6B-4B72-A24A-949803234EE1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DFB5F077-1C6B-4B72-A24A-949803234EE1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DFB5F077-1C6B-4B72-A24A-949803234EE1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DFB5F077-1C6B-4B72-A24A-949803234EE1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
