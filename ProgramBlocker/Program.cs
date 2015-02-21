@@ -13,7 +13,7 @@ namespace ProgramBlocker
 			{
 				MessageBox.Show(string.Format("Anticrastinate is currently blocking {0} \nShouldn't you be working?", args[0].Split('\\').Last()),
 					"Program Blocked", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-			}
+            }
 		}
 	}
 }

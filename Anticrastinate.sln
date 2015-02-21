@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AnticrastinateCore", "Antic
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProgramBlocker", "ProgramBlocker\ProgramBlocker.csproj", "{DFB5F077-1C6B-4B72-A24A-949803234EE1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FiddlerTesting", "FiddlerTesting\FiddlerTesting.csproj", "{20388F0E-0FCA-4F14-87B7-E129569B5F36}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{DFB5F077-1C6B-4B72-A24A-949803234EE1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DFB5F077-1C6B-4B72-A24A-949803234EE1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DFB5F077-1C6B-4B72-A24A-949803234EE1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{20388F0E-0FCA-4F14-87B7-E129569B5F36}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{20388F0E-0FCA-4F14-87B7-E129569B5F36}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{20388F0E-0FCA-4F14-87B7-E129569B5F36}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{20388F0E-0FCA-4F14-87B7-E129569B5F36}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
