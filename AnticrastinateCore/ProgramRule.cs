@@ -4,10 +4,27 @@ namespace AnticrastinateCore
 {
     class ProgramRule
     {
-        public ProgramRule(string name, string path)
+        /// <summary>
+        /// Initializes a new instance of the ProgramRule class.
+        /// </summary>
+        /// <param name="path">
+        /// The full path to the executable,
+        /// or just its file name if all programs of the same name are to be blocked.
+        /// </param>
+        public ProgramRule(string path)
         {
-            Name = name;
-            Path = path;
+            int finalSlashPos = path.LastIndexOf(System.IO.Path.DirectorySeparatorChar);
+            if (finalSlashPos == -1)
+            {
+                // path has no backslashes so it is just a file name.
+                Name = path;
+                Path = null;
+            }
+            else
+            {
+                Path = path;
+                Name = path.Substring(finalSlashPos + 1);
+            }
         }
 
         /// <summary>
