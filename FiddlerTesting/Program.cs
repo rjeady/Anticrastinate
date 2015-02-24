@@ -14,7 +14,6 @@ namespace FiddlerTesting
 
             Console.WriteLine("Fiddler starting.");
            
-
             FiddlerApplication.SetAppDisplayName("FiddlerTesting");
 
             // Fiddler.FiddlerApplication.OnNotification += delegate(object sender, NotificationEventArgs oNEA) { Console.WriteLine("** NotifyUser: " + oNEA.NotifyString); };
