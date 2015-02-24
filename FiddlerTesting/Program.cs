@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using Fiddler;
 
 namespace FiddlerTesting
@@ -11,18 +8,18 @@ namespace FiddlerTesting
     {
         static void Main(string[] args)
         {
-            Fiddler.FiddlerApplication.Shutdown();
-            Fiddler.FiddlerApplication.Shutdown();
-            Fiddler.FiddlerApplication.Shutdown();
+            FiddlerApplication.Shutdown();
+            FiddlerApplication.Shutdown();
+            FiddlerApplication.Shutdown();
 
             Console.WriteLine("Fiddler starting.");
            
 
-            Fiddler.FiddlerApplication.SetAppDisplayName("FiddlerTesting");
+            FiddlerApplication.SetAppDisplayName("FiddlerTesting");
 
-           //  Fiddler.FiddlerApplication.OnNotification += delegate(object sender, NotificationEventArgs oNEA) { Console.WriteLine("** NotifyUser: " + oNEA.NotifyString); };
+            // Fiddler.FiddlerApplication.OnNotification += delegate(object sender, NotificationEventArgs oNEA) { Console.WriteLine("** NotifyUser: " + oNEA.NotifyString); };
             // Fiddler.FiddlerApplication.Log.OnLogString += delegate(object sender, LogEventArgs oLEA) { Console.WriteLine("** LogString: " + oLEA.LogString); };
-            Fiddler.FiddlerApplication.BeforeRequest += s =>
+            FiddlerApplication.BeforeRequest += s =>
             {
 
                 if (s.fullUrl.Contains("flag"))
@@ -44,10 +41,10 @@ namespace FiddlerTesting
                         FiddlerCoreStartupFlags.MonitorAllConnections |
                         FiddlerCoreStartupFlags.RegisterAsSystemProxy;
 
-            Fiddler.FiddlerApplication.Startup(14823, flags);
+            FiddlerApplication.Startup(14823, flags);
             Console.WriteLine("Fiddler started.");
             Console.ReadLine();
-            Fiddler.FiddlerApplication.Shutdown();
+            FiddlerApplication.Shutdown();
             Console.WriteLine("Fiddler stopped.");
             Console.ReadLine();
         }
