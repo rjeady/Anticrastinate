@@ -30,12 +30,11 @@ namespace AnticrastinateCore
         /// <summary>
         /// The name of the program executable, including the file extension.
         /// </summary>
-        public String Name { get; }
+        public String Name { get; private set; }
 
         /// <summary>
         /// The complete file path of the program. May be null if all programs of the same name are to be blocked.
         /// </summary>
-        public String Path { get; }
-
+        public String Path { get; private set; }
     }
 }
