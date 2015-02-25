@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Win32;
 
 namespace AnticrastinateCore
@@ -12,16 +13,13 @@ namespace AnticrastinateCore
 
         public void Enforce(RuleSet newRuleSet, RuleSet oldRuleSet)
         {
-            // compute a rule delta
+            // compute a rule deltas.
             // unblock programs that are only in the old RuleSet
-            var unblockPrograms = oldRuleSet.BlockedPrograms.Except(newRuleSet.BlockedPrograms);
-            // block programs that are only in the new RuleSet
-            var blockPrograms = newRuleSet.BlockedPrograms.Except(oldRuleSet.BlockedPrograms);
-
-            foreach (var program in unblockPrograms)
+            foreach (var program in oldRuleSet.BlockedPrograms.Except(newRuleSet.BlockedPrograms))
                 Unblock(program);
-
-            foreach (var program in blockPrograms)
+           
+            // block programs that are only in the new RuleSet
+            foreach (var program in newRuleSet.BlockedPrograms.Except(oldRuleSet.BlockedPrograms))
                 Block(program);
         }
 
