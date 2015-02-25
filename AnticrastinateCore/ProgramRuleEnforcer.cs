@@ -4,7 +4,8 @@ using Microsoft.Win32;
 namespace AnticrastinateCore
 {
     /// <summary>
-    /// Enforces program RuleSets, using the registry to block programs, by launching our specified executable as a 'debugger' instead.
+    /// Enforces program RuleSets, using the registry to block programs,
+    /// by launching our specified executable as a 'debugger' instead.
     /// </summary>
     class ProgramRuleEnforcer
     {
@@ -13,6 +14,11 @@ namespace AnticrastinateCore
         // TODO: obtain correct path to program blocker executable.
         private const string BlockingKeyValue = @"C:\ProgramBlocker.exe";
 
+        /// <summary>
+        /// Enforces the specified new rule set.
+        /// </summary>
+        /// <param name="newRuleSet">The new rule set.</param>
+        /// <param name="oldRuleSet">The old rule set.</param>
         public void Enforce(RuleSet newRuleSet, RuleSet oldRuleSet)
         {
             // compute a rule deltas.
@@ -25,6 +31,10 @@ namespace AnticrastinateCore
                 Block(program);
         }
 
+        /// <summary>
+        /// Blocks the specified program.
+        /// </summary>
+        /// <param name="program">The program.</param>
         private void Block(ProgramRule program)
         {
             var baseKey = Registry.LocalMachine.OpenSubKey(RootKeyPath, true);
@@ -38,6 +48,10 @@ namespace AnticrastinateCore
             // or program key coouldn't be created.
         }
 
+        /// <summary>
+        /// Unblocks the specified program.
+        /// </summary>
+        /// <param name="program">The program.</param>
         private void Unblock(ProgramRule program)
         {
             var baseKey = Registry.LocalMachine.OpenSubKey(RootKeyPath, true);
