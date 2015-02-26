@@ -2,10 +2,21 @@
 
 namespace AnticrastinateCore
 {
-    class WebsiteRule
+    class WebsiteRule : IEquatable<WebsiteRule>
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="WebsiteRule"/> class.
+        /// </summary>
+        /// <param name="host">The hostname.</param>
+        /// <param name="path">The path.</param>
+        /// <exception cref="System.ArgumentNullException">
+        /// host or path arguments are null.
+        /// </exception>
         public WebsiteRule(string host, string path)
-        {
+        {   
+            if (host == null) throw new ArgumentNullException("host");
+            if (path == null) throw new ArgumentNullException("path");
+                 
             Host = host;
             Path = path;
         }
@@ -22,6 +33,32 @@ namespace AnticrastinateCore
         /// If the rule does not depend on the path, should be an empty string.
         /// </summary>
         public String Path { get; private set; }
-        
+
+        #region Value Equality Members
+
+        public bool Equals(WebsiteRule other)
+        {
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return string.Equals(Host, other.Host) && string.Equals(Path, other.Path);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
+            return Equals((WebsiteRule)obj);
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                return (Host.GetHashCode()*397) ^ Path.GetHashCode();
+            }
+        }
+
+        #endregion
     }
 }

@@ -14,21 +14,31 @@ namespace AnticrastinateCore
         // TODO: obtain correct path to program blocker executable.
         private const string BlockingKeyValue = @"C:\ProgramBlocker.exe";
 
-        /// <summary>
-        /// Enforces the specified new rule set.
-        /// </summary>
-        /// <param name="newRuleSet">The new rule set.</param>
-        /// <param name="oldRuleSet">The old rule set.</param>
-        public void Enforce(RuleSet newRuleSet, RuleSet oldRuleSet)
+        private RuleSet ruleSet;
+
+        public ProgramRuleEnforcer(RuleSet existingRuleSet)
         {
-            // compute a rule deltas.
-            // unblock programs that are only in the old RuleSet
-            foreach (var program in oldRuleSet.BlockedPrograms.Except(newRuleSet.BlockedPrograms))
-                Unblock(program);
-           
-            // block programs that are only in the new RuleSet
-            foreach (var program in newRuleSet.BlockedPrograms.Except(oldRuleSet.BlockedPrograms))
-                Block(program);
+            ruleSet = existingRuleSet;
+        }
+
+        public RuleSet RuleSet
+        {
+            get { return ruleSet; }
+            set
+            {
+                if (ruleSet != value)
+                {
+                    // unblock programs that are only in the old RuleSet
+                    foreach (var program in ruleSet.BlockedPrograms.Except(value.BlockedPrograms))
+                        Unblock(program);
+
+                    // block programs that are only in the new RuleSet
+                    foreach (var program in value.BlockedPrograms.Except(ruleSet.BlockedPrograms))
+                        Block(program);
+
+                    ruleSet = value;
+                }
+            }
         }
 
         /// <summary>

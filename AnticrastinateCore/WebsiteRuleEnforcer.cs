@@ -24,6 +24,34 @@ namespace AnticrastinateCore
             FiddlerApplication.Startup(Port, Flags);
         }
 
+        public RuleSet RuleSet
+        {
+            get
+            {
+                return ruleSet;
+            }
+            set
+            {
+                if (ruleSet != value)
+                {
+                    ruleSet = value;
+                    AnythingBlocked = ruleSet.BlockedWebsites.Any();
+                }
+            }
+        }
+
+        private bool AnythingBlocked
+        {
+            set
+            {
+                if (!anythingBlocked && value)
+                    FiddlerApplication.BeforeRequest += HandleFiddlerBeforeRequest;
+                else if (anythingBlocked && !value)
+                    FiddlerApplication.BeforeRequest -= HandleFiddlerBeforeRequest;
+                anythingBlocked = value;
+            }
+        }
+
         private void HandleFiddlerBeforeRequest(Session s)
         {
             if (MatchWebsite(s, RuleSet.AllowedWebsites))
@@ -31,15 +59,6 @@ namespace AnticrastinateCore
             
             if (MatchWebsite(s, RuleSet.BlockedWebsites))
                 BlockConnection(s);
-            
-        }
-
-        private void BlockConnection(Session s)
-        {
-            // TODO: make a proper response. See https://reqrypt.org/samples/webfilter.html
-            s.utilCreateResponseAndBypassServer();
-            s.oResponse.headers.Add("Content-Type", "text/plain");
-            s.ResponseBody = Encoding.UTF8.GetBytes("You done fucked up now");
         }
 
         /// <summary>
@@ -70,30 +89,12 @@ namespace AnticrastinateCore
             return false;
         }
 
-        public RuleSet RuleSet
+        private void BlockConnection(Session s)
         {
-            get
-            {
-                return ruleSet;
-            }
-            set
-            {
-                ruleSet = value;
-                AnythingBlocked = ruleSet.BlockedWebsites.Any();
-            }
-        }
-
-
-        private bool AnythingBlocked
-        {
-            set
-            {
-                if (!anythingBlocked && value)
-                    FiddlerApplication.BeforeRequest += HandleFiddlerBeforeRequest;
-                else if (anythingBlocked && !value)
-                    FiddlerApplication.BeforeRequest -= HandleFiddlerBeforeRequest;
-                anythingBlocked = value;
-            }
+            // TODO: make a proper response. See https://reqrypt.org/samples/webfilter.html
+            s.utilCreateResponseAndBypassServer();
+            s.oResponse.headers.Add("Content-Type", "text/plain");
+            s.ResponseBody = Encoding.UTF8.GetBytes("You done fucked up now");
         }
 
         ~WebsiteRuleEnforcer()

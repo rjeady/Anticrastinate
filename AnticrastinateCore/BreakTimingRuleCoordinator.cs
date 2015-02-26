@@ -40,7 +40,7 @@ namespace AnticrastinateCore
                 return false;
 
             OnBreak = true;
-            programRuleEnforcer.Enforce(BreakRuleSet, WorkRuleSet);
+            programRuleEnforcer.RuleSet = BreakRuleSet;
             websiteRuleEnforcer.RuleSet = BreakRuleSet;
             timer.Start();
             return true;
@@ -49,7 +49,7 @@ namespace AnticrastinateCore
         public void EndBreak()
         {
             OnBreak = false;
-            programRuleEnforcer.Enforce(WorkRuleSet, BreakRuleSet);
+            programRuleEnforcer.RuleSet = WorkRuleSet;
             websiteRuleEnforcer.RuleSet = WorkRuleSet;
 
             timer.Pause();
