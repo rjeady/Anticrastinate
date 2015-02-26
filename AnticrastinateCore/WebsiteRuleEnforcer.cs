@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Text;
 using Fiddler;
 
@@ -50,6 +49,11 @@ namespace AnticrastinateCore
             }
         }
 
+        /// <summary>
+        /// Handles Fiddler's BeforeRequest event. This is executed upon every web request,
+        /// so must determine whether we should block the connection as quickly as possible.
+        /// </summary>
+        /// <param name="s">The session.</param>
         private void HandleFiddlerBeforeRequest(Session s)
         {
             if (RuleSet.BlockAllWebsites)
