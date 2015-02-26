@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using Fiddler;
 
@@ -8,8 +9,8 @@ namespace AnticrastinateCore
 {
     internal class WebsiteRuleEnforcer
     {
-        private const int Port = 14823;
-        private const FiddlerCoreStartupFlags Flags = 
+        private const int FiddlerPort = 14823;
+        private const FiddlerCoreStartupFlags FiddlerFlags = 
             FiddlerCoreStartupFlags.CaptureLocalhostTraffic |
             FiddlerCoreStartupFlags.MonitorAllConnections |
             FiddlerCoreStartupFlags.RegisterAsSystemProxy;
@@ -21,15 +22,12 @@ namespace AnticrastinateCore
         {
             RuleSet = ruleSet;
             FiddlerApplication.SetAppDisplayName("Anticrastinate");
-            FiddlerApplication.Startup(Port, Flags);
+            FiddlerApplication.Startup(FiddlerPort, FiddlerFlags);
         }
 
         public RuleSet RuleSet
         {
-            get
-            {
-                return ruleSet;
-            }
+            get { return ruleSet; }
             set
             {
                 if (ruleSet != value)
@@ -57,38 +55,33 @@ namespace AnticrastinateCore
             if (RuleSet.BlockAllWebsites)
                 BlockConnection(s);
 
-            if (MatchWebsite(s, RuleSet.AllowedWebsites))
+            int pathStart = s.url.IndexOf("/", StringComparison.Ordinal);
+            // path is empty if URL (without protocol) ends in '/' or does not contain a '/'.
+            // empty path will only be matched by a rule with an empty path.
+            string path = pathStart == -1 ? "" : s.url.Substring(pathStart + 1);
+
+            if (MatchWebsite(s.hostname, path, RuleSet.AllowedWebsites))
                 return;
-            
-            if (MatchWebsite(s, RuleSet.BlockedWebsites))
+
+            if (MatchWebsite(s.hostname, path, RuleSet.BlockedWebsites))
                 BlockConnection(s);
         }
 
         /// <summary>
         /// Returns true if the website url for this session matches any of the given rules.
         /// </summary>
-        /// <param name="s">The session.</param>
+        /// <param name="hostName">The hostname.</param>
+        /// <param name="path">The path.</param>
         /// <param name="rules">The rules.</param>
-        private bool MatchWebsite(Session s, IEnumerable<WebsiteRule> rules)
+        /// <returns></returns>
+        private bool MatchWebsite(String hostName, String path, IEnumerable<WebsiteRule> rules)
         {
+            // TODO: compare performance to using AsParallel()
             foreach (var rule in rules)
             {
-                bool noPathRule = rule.Path == "";
-                if (s.hostname.EndsWith(rule.Host))
-                {
-                    if (noPathRule)
-                    {
-                        return true;
-                    }
-                    else
-                    {
-                        int pathStart = s.url.IndexOf("/", StringComparison.Ordinal);
-                        if (pathStart >= 0 && s.url.Substring(pathStart + 1).StartsWith(rule.Path))
-                            return true;
-                    }
-                }
+                if (hostName.EndsWith(rule.Host) && path.StartsWith(rule.Path))
+                    return true;
             }
-
             return false;
         }
 

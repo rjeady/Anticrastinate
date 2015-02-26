@@ -51,7 +51,6 @@ namespace AnticrastinateCore
             OnBreak = false;
             programRuleEnforcer.RuleSet = WorkRuleSet;
             websiteRuleEnforcer.RuleSet = WorkRuleSet;
-
             timer.Pause();
         }
 
