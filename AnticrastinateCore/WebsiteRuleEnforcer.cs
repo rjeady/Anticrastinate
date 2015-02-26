@@ -42,6 +42,11 @@ namespace AnticrastinateCore
             s.ResponseBody = Encoding.UTF8.GetBytes("You done fucked up now");
         }
 
+        /// <summary>
+        /// Returns true if the website url for this session matches any of the given rules.
+        /// </summary>
+        /// <param name="s">The session.</param>
+        /// <param name="rules">The rules.</param>
         private bool MatchWebsite(Session s, IEnumerable<WebsiteRule> rules)
         {
             foreach (var rule in rules)
@@ -55,12 +60,13 @@ namespace AnticrastinateCore
                     }
                     else
                     {
-                        int pathStart = s.url.IndexOf("/");
-                        if (pathStart >= 0)
-                            return s.url.Substring(pathStart + 1).StartsWith(rule.Path);
+                        int pathStart = s.url.IndexOf("/", StringComparison.Ordinal);
+                        if (pathStart >= 0 && s.url.Substring(pathStart + 1).StartsWith(rule.Path))
+                            return true;
                     }
                 }
             }
+
             return false;
         }
 
