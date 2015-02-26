@@ -34,7 +34,7 @@ namespace AnticrastinateCore
         /// <summary>
         /// Blocks the specified program.
         /// </summary>
-        /// <param name="program">The program.</param>
+        /// <param name="program">The program rule.</param>
         private void Block(ProgramRule program)
         {
             var baseKey = Registry.LocalMachine.OpenSubKey(RootKeyPath, true);
@@ -45,13 +45,13 @@ namespace AnticrastinateCore
 
             // TODO: handle failures cases -
             // Image File Exceution Options key couldn't be opened,
-            // or program key coouldn't be created.
+            // or program key couldn't be created.
         }
 
         /// <summary>
         /// Unblocks the specified program.
         /// </summary>
-        /// <param name="program">The program.</param>
+        /// <param name="program">The program rule.</param>
         private void Unblock(ProgramRule program)
         {
             var baseKey = Registry.LocalMachine.OpenSubKey(RootKeyPath, true);

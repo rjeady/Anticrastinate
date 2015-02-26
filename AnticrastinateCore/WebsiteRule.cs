@@ -17,7 +17,7 @@ namespace AnticrastinateCore
         public String Host { get; private set; }
 
         /// <summary>
-        /// The path to be blocked, starting with a '/' character, for example "/members/rhobium/".
+        /// The path to be blocked, starting with the character after the first '/', for example "members/rhobium/".
         /// A page should be blocked if its path begins with this string.
         /// If the rule does not depend on the path, should be an empty string.
         /// </summary>

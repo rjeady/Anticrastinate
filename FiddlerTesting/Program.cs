@@ -4,7 +4,7 @@ using Fiddler;
 
 namespace FiddlerTesting
 {
-    class Program
+    static class Program
     {
         static void Main(string[] args)
         {
@@ -46,6 +46,8 @@ namespace FiddlerTesting
             FiddlerApplication.Shutdown();
             Console.WriteLine("Fiddler stopped.");
             Console.ReadLine();
+
+            
         }
     }
 }
