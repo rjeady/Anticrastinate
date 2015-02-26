@@ -54,6 +54,9 @@ namespace AnticrastinateCore
 
         private void HandleFiddlerBeforeRequest(Session s)
         {
+            if (RuleSet.BlockAllWebsites)
+                BlockConnection(s);
+
             if (MatchWebsite(s, RuleSet.AllowedWebsites))
                 return;
             
