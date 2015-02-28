@@ -99,8 +99,8 @@ namespace AnticrastinateCore
 
         ~WebsiteRuleEnforcer()
         {
-            // TODO: when implemented as a service, this must be called when the service stops.
+            // TODO: if implemented as a service, this must be called when the service stops.
             FiddlerApplication.Shutdown();
         }
-}
+    }
 }

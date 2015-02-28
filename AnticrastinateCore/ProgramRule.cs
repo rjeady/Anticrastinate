@@ -48,10 +48,7 @@ namespace AnticrastinateCore
 
         public override bool Equals(object obj)
         {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
-            return Equals((ProgramRule) obj);
+            return Equals(obj as ProgramRule);
         }
 
         public override int GetHashCode()
