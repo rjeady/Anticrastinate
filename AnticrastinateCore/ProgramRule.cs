@@ -5,7 +5,7 @@ namespace AnticrastinateCore
     class ProgramRule : IEquatable<ProgramRule>
     {
         /// <summary>
-        /// Initializes a new instance of the ProgramRule class.
+        /// Initializes a new instance of the <see cref="ProgramRule"/> class.
         /// </summary>
         /// <param name="path">
         /// The full path to the executable,
@@ -13,6 +13,8 @@ namespace AnticrastinateCore
         /// </param>
         public ProgramRule(string path)
         {
+            if (path == null) throw new ArgumentNullException("path");
+
             int finalSlashPos = path.LastIndexOf(System.IO.Path.DirectorySeparatorChar);
             if (finalSlashPos == -1)
             {
@@ -25,6 +27,23 @@ namespace AnticrastinateCore
                 Path = path;
                 Name = path.Substring(finalSlashPos + 1);
             }
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ProgramRule"/> class.
+        /// </summary>
+        /// <param name="name">The file name of the executable.</param>
+        /// <param name="path">
+        /// The path to the executable,
+        /// or an empty string if all programs of the same name are to be blocked.
+        /// </param>
+        public ProgramRule(string name, string path)
+        {
+            if (name == null) throw new ArgumentNullException("name");
+            if (path == null) throw new ArgumentNullException("path");
+
+            Name = name;
+            Path = path;
         }
 
         /// <summary>

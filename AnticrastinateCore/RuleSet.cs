@@ -26,18 +26,16 @@ namespace AnticrastinateCore
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="RuleSet"/> class,
-        /// with either all websites allowed or all websites blocked.
+        /// Initializes a new instance of the <see cref="RuleSet"/> class, with all websites blocked.
         /// </summary>
         /// <param name="name"></param>
         /// <param name="blockedPrograms">The blocked program rules.</param>
-        /// <param name="blockAllWebsites">if set to <c>true</c>, all websites will be blocked.</param>
-        public RuleSet(string name, IEnumerable<ProgramRule> blockedPrograms, bool blockAllWebsites)
+        public RuleSet(string name, IEnumerable<ProgramRule> blockedPrograms)
         {
             Name = name;
             BlockedPrograms = blockedPrograms;
             BlockedWebsites = AllowedWebsites = Enumerable.Empty<WebsiteRule>();
-            BlockAllWebsites = blockAllWebsites;
+            BlockAllWebsites = true;
         }
 
         public String Name { get; private set; }
