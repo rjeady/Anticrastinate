@@ -8,9 +8,8 @@ namespace FiddlerTesting
     {
         static void Main(string[] args)
         {
-            FiddlerApplication.Shutdown();
-            FiddlerApplication.Shutdown();
-            FiddlerApplication.Shutdown();
+            //FiddlerApplication.Shutdown();
+            //FiddlerApplication.Shutdown();
 
             Console.WriteLine("Fiddler starting.");
            
@@ -36,9 +35,10 @@ namespace FiddlerTesting
                 }
             };
 
-            var flags = FiddlerCoreStartupFlags.CaptureLocalhostTraffic |
-                        FiddlerCoreStartupFlags.MonitorAllConnections |
-                        FiddlerCoreStartupFlags.RegisterAsSystemProxy;
+            var flags = FiddlerCoreStartupFlags.MonitorAllConnections |
+                        FiddlerCoreStartupFlags.RegisterAsSystemProxy |
+                        FiddlerCoreStartupFlags.OptimizeThreadPool |
+                        FiddlerCoreStartupFlags.ChainToUpstreamGateway;
 
             FiddlerApplication.Startup(14823, flags);
             Console.WriteLine("Fiddler started.");
