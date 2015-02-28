@@ -21,43 +21,31 @@ namespace IPCTestingClient
         {
             Console.WriteLine("Client? Bitch I might be.");
             Console.WriteLine("Type in a string and press enter to reverse it.");
-            // UseWcf();
+
             UseStreams();
         }
 
-        private static void UseWcf()
-        {
-            ChannelFactory<IStringReverser> pipeFactory = new ChannelFactory<IStringReverser>(
-                new NetNamedPipeBinding(), new EndpointAddress("net.pipe://localhost/PipeReverse"));
-
-            IStringReverser pipeProxy = null;
-            Console.WriteLine("Create channel time: {0}ms", Time(Sw, () => { pipeProxy = pipeFactory.CreateChannel(); }));
-
-            while (true)
-            {
-                string str = Console.ReadLine();
-                Console.WriteLine("response took {0}ms", Time(Sw, () => Console.WriteLine("reversed: {0}", pipeProxy.ReverseString(str))));
-            }
-        }
 
         private static void UseStreams()
         {
             Sw.Restart();
-            using (var clientStream = new NamedPipeClientStream("reversi2"))
+            using (var clientStream = new NamedPipeClientStream("reverser"))
             {
                 clientStream.Connect();
-                using (StreamReader sr = new StreamReader(clientStream))
-                using (StreamWriter sw = new StreamWriter(clientStream) {AutoFlush = true})
+                using (BinaryReader br = new BinaryReader(clientStream))
+                using (BinaryWriter bw = new BinaryWriter(clientStream))
                 {
-                    string str;
                     Sw.Stop();
                     Console.WriteLine("Setup time: {0}ms", 1000 * (double)Sw.ElapsedTicks / Stopwatch.Frequency);
+
+                    string str;
                     while ((str = Console.ReadLine()) != "")
                     {
                         Console.WriteLine("response took {0}ms", Time(Sw, () =>
                         {
-                            sw.WriteLine(str);
-                            Console.WriteLine("reversed: {0}", sr.ReadLine());
+                            bw.Write(str);
+                            bw.Flush();
+                            Console.WriteLine("reversed: {0}", br.ReadString());
                         }));
                     }
                 }    

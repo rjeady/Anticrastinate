@@ -28,7 +28,7 @@ namespace IPCTestingServer
 
     internal static class Program
     {
-        private static StringReverser stringReverser = new StringReverser();
+        private static readonly StringReverser stringReverser = new StringReverser();
 
         /// <summary>
         /// The main entry point for the application.
@@ -36,24 +36,7 @@ namespace IPCTestingServer
         private static void Main()
         {
             Console.WriteLine("Server? Bitch I might be.");
-
-            // UseWCF();
             UseStreams();
-        }
-
-        private static void UseWCF()
-        {
-            using (var host = new ServiceHost(typeof (StringReverser), new Uri("net.pipe://localhost")))
-            {
-                host.AddServiceEndpoint(typeof (IStringReverser), new NetNamedPipeBinding(), "PipeReverse");
-
-                host.Open();
-
-                Console.WriteLine("Service is available. Press <ENTER> to exit.");
-                Console.ReadLine();
-
-                host.Close();
-            }
         }
 
         private static void UseStreams()
@@ -61,7 +44,7 @@ namespace IPCTestingServer
             while (true)
             {
                 NamedPipeServerStream stream =
-                    new NamedPipeServerStream("reversi2", PipeDirection.InOut, -1, PipeTransmissionMode.Byte);
+                    new NamedPipeServerStream("reverser", PipeDirection.InOut, -1, PipeTransmissionMode.Byte);
 
                 stream.WaitForConnection();
                 Task.Factory.StartNew(() => Process(stream));
@@ -71,15 +54,24 @@ namespace IPCTestingServer
         private static void Process(NamedPipeServerStream stream)
         {
             using (stream)
-            using (var sr = new StreamReader(stream))
-            using (var sw = new StreamWriter(stream) {AutoFlush = true})
+            using (var br = new BinaryReader(stream))
+            using (var bw = new BinaryWriter(stream))
             {
                 string request;
-                while ((request = sr.ReadLine()) != null)
+                while (true)
                 {
-                    var response = stringReverser.ReverseString(request);
-                    Console.WriteLine("Client request received: reversing '{0}' produces '{1}'", request, response);
-                    sw.WriteLine(response);
+                    try
+                    {
+                        request = br.ReadString();
+                        var response = stringReverser.ReverseString(request);
+                        Console.WriteLine("Client request received: reversing '{0}' produces '{1}'", request, response);
+                        bw.Write(response);
+                        bw.Flush();
+                    }
+                    catch (EndOfStreamException)
+                    {
+                        break;
+                    }    
                 }
                 Console.WriteLine("Client disconnected.");
             }
