@@ -78,6 +78,7 @@ namespace IPCTestingServer
                 while ((request = sr.ReadLine()) != null)
                 {
                     var response = stringReverser.ReverseString(request);
+                    Console.WriteLine("Client request received: reversing '{0}' produces '{1}'", request, response);
                     sw.WriteLine(response);
                 }
                 Console.WriteLine("Client disconnected.");

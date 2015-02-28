@@ -20,7 +20,7 @@ namespace IPCTestingClient
         private static void Main(string[] args)
         {
             Console.WriteLine("Client? Bitch I might be.");
-
+            Console.WriteLine("Type in a string and press enter to reverse it.");
             // UseWcf();
             UseStreams();
         }
@@ -42,6 +42,7 @@ namespace IPCTestingClient
 
         private static void UseStreams()
         {
+            Sw.Restart();
             using (var clientStream = new NamedPipeClientStream("reversi2"))
             {
                 clientStream.Connect();
@@ -49,6 +50,8 @@ namespace IPCTestingClient
                 using (StreamWriter sw = new StreamWriter(clientStream) {AutoFlush = true})
                 {
                     string str;
+                    Sw.Stop();
+                    Console.WriteLine("Setup time: {0}ms", 1000 * (double)Sw.ElapsedTicks / Stopwatch.Frequency);
                     while ((str = Console.ReadLine()) != "")
                     {
                         Console.WriteLine("response took {0}ms", Time(Sw, () =>
