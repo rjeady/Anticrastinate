@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
-using System.Linq.Expressions;
-using System.Net.Sockets;
 using System.Security;
 using System.Xml.Linq;
 
@@ -40,7 +37,8 @@ namespace AnticrastinateCore
 
         #endregion
 
-        public IEnumerable<RuleSet> RuleSets
+        /// <summary>Gets all rule sets.</summary>
+        public IList<RuleSet> RuleSets
         {
             get { return ruleSets; }
         }
@@ -48,6 +46,8 @@ namespace AnticrastinateCore
         /// <summary>Adds the specified rule set to the repository.</summary>
         /// <param name="ruleSet">The rule set to add.</param>
         /// <exception cref="IOException">An error occurred when creating or writing to the rule sets file.</exception>
+        /// <exception cref="System.Security.SecurityException">We do not have the required permissions to create the rule sets file.</exception>
+        /// <exception cref="UnauthorizedAccessException">We are not permitted to write to a file on the rule sets file path.</exception>
         public void Add(RuleSet ruleSet)
         {
             ruleSets.Add(ruleSet);
@@ -65,8 +65,8 @@ namespace AnticrastinateCore
 
         /// <summary>
         /// Deletes the specified rule set from the repository.
-        /// If one of the specified exceptions occurs, the delete operation will be automatically rolled back.
-        /// The exception will then be re-thrown for the calling code to handle.
+        /// If one of the specified exceptions occurs, the delete operation will be automatically rolled back,
+        /// and the exception will then be re-thrown for the calling code to handle.
         /// </summary>
         /// <param name="ruleSet">The rule set to delete.</param>
         /// <exception cref="InvalidOperationException">The specified rule set is not present in the repository.</exception>
