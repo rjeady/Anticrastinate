@@ -16,8 +16,8 @@ namespace AnticrastinateCore
         /// <param name="blockedPrograms">The blocked program rules.</param>
         /// <param name="allowedWebsites">The allowed website rules.</param>
         /// <param name="blockedWebsites">The blocked website rules.</param>
-        public RuleSet(string name, IEnumerable<ProgramRule> blockedPrograms,
-            IEnumerable<WebsiteRule> allowedWebsites, IEnumerable<WebsiteRule> blockedWebsites)
+        public RuleSet(string name, IList<ProgramRule> blockedPrograms,
+            IList<WebsiteRule> allowedWebsites, IList<WebsiteRule> blockedWebsites)
         {
             Name = name;
             BlockedPrograms = blockedPrograms;
@@ -30,19 +30,20 @@ namespace AnticrastinateCore
         /// </summary>
         /// <param name="name"></param>
         /// <param name="blockedPrograms">The blocked program rules.</param>
-        public RuleSet(string name, IEnumerable<ProgramRule> blockedPrograms)
+        public RuleSet(string name, IList<ProgramRule> blockedPrograms)
         {
             Name = name;
             BlockedPrograms = blockedPrograms;
-            BlockedWebsites = AllowedWebsites = Enumerable.Empty<WebsiteRule>();
+            BlockedWebsites = new List<WebsiteRule>();
+            AllowedWebsites = new List<WebsiteRule>();
             BlockAllWebsites = true;
         }
 
         public String Name { get; private set; }
 
-        public IEnumerable<ProgramRule> BlockedPrograms { get; private set; }
-        public IEnumerable<WebsiteRule> AllowedWebsites { get; private set; }
-        public IEnumerable<WebsiteRule> BlockedWebsites { get; private set; }
+        public IList<ProgramRule> BlockedPrograms { get; private set; }
+        public IList<WebsiteRule> AllowedWebsites { get; private set; }
+        public IList<WebsiteRule> BlockedWebsites { get; private set; }
 
         /// <summary>
         /// Gets a value indicating whether to block all websites. If <c>true</c>,
