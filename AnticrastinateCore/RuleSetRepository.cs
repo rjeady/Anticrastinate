@@ -84,6 +84,7 @@ namespace AnticrastinateCore
                     try
                     {
                         Save();
+                        return;
                     }
                     catch (Exception ex)
                     {
@@ -114,39 +115,39 @@ namespace AnticrastinateCore
         public void Load()
         {
             var root = XElement.Load(filePath).Element("RuleSets");
-            if (root != null)
+            if (root == null) 
+                return;
+
+            var ruleSetEls = root.Elements(RuleSet);
+            foreach (var ruleSetEl in ruleSetEls)
             {
-                var ruleSetEls = root.Elements(RuleSet);
-                foreach (var ruleSetEl in ruleSetEls)
+                String name = (string)ruleSetEl.Attribute(RuleSetName);
+
+                bool blockAllWebsites; // default to false if attribute isn't present/readable
+                bool.TryParse((string)ruleSetEl.Attribute(BlockAllWebsites), out blockAllWebsites);
+
+                var bpEl = ruleSetEl.Element(BlockedPrograms);
+                var blockedPrograms = (bpEl == null)
+                    ? new List<ProgramRule>()
+                    : bpEl.Elements(ProgramRule).Select(ProgramRuleFromXElement).Where(e => e != null).ToList();
+
+                if (blockAllWebsites)
                 {
-                    String name = (string)ruleSetEl.Attribute(RuleSetName);
+                    ruleSets.Add(new RuleSet(name, blockedPrograms));
+                }
+                else
+                {
+                    var awEl = ruleSetEl.Element(AllowedWebsites);
+                    var allowedWebsites = (awEl == null)
+                        ? new List<WebsiteRule>()
+                        : awEl.Elements(WebsiteRule).Select(WebsiteRuleFromXElement).Where(e => e != null).ToList();
 
-                    bool blockAllWebsites; // default to false if attribute isn't present/readable
-                    bool.TryParse((string)ruleSetEl.Attribute(BlockAllWebsites), out blockAllWebsites);
+                    var bwEl = ruleSetEl.Element(BlockedWebsites);
+                    var blockedWebsites = (bwEl == null)
+                        ? new List<WebsiteRule>()
+                        : bwEl.Elements(WebsiteRule).Select(WebsiteRuleFromXElement).Where(e => e != null).ToList();
 
-                    var bpEl = ruleSetEl.Element(BlockedPrograms);
-                    var blockedPrograms = (bpEl == null)
-                        ? new List<ProgramRule>()
-                        : bpEl.Elements(ProgramRule).Select(ProgramRuleFromXElement).Where(e => e != null).ToList();
-
-                    if (blockAllWebsites)
-                    {
-                        ruleSets.Add(new RuleSet(name, blockedPrograms));
-                    }
-                    else
-                    {
-                        var awEl = ruleSetEl.Element(AllowedWebsites);
-                        var allowedWebsites = (awEl == null)
-                            ? new List<WebsiteRule>()
-                            : awEl.Elements(WebsiteRule).Select(WebsiteRuleFromXElement).Where(e => e != null).ToList();
-
-                        var bwEl = ruleSetEl.Element(BlockedWebsites);
-                        var blockedWebsites = (bwEl == null)
-                            ? new List<WebsiteRule>()
-                            : bwEl.Elements(WebsiteRule).Select(WebsiteRuleFromXElement).Where(e => e != null).ToList();
-
-                        ruleSets.Add(new RuleSet(name, blockedPrograms, allowedWebsites, blockedWebsites));
-                    }
+                    ruleSets.Add(new RuleSet(name, blockedPrograms, allowedWebsites, blockedWebsites));
                 }
             }
         }
