@@ -14,9 +14,10 @@ namespace AnticrastinateCore
         #region XML File, Element & Attribute Names
 
         private const string FileName = "RuleSets.xml";
+        private const string Folder = "Anticrastinate";
 
         private readonly string filePath =
-            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), FileName);
+            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), Folder, FileName);
 
         private const string RuleSet = "RuleSet";
         private const string RuleSetName = "Name";
