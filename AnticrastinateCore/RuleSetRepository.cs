@@ -45,19 +45,33 @@ namespace AnticrastinateCore
 
         /// <summary>Adds the specified rule set to the repository.</summary>
         /// <param name="ruleSet">The rule set to add.</param>
-        /// <exception cref="IOException">An error occurred when creating or writing to the rule sets file.</exception>
-        /// <exception cref="System.Security.SecurityException">We do not have the required permissions to create the rule sets file.</exception>
-        /// <exception cref="UnauthorizedAccessException">We are not permitted to write to a file on the rule sets file path.</exception>
+        /// <exception cref="IOException">
+        /// An error occurred when creating or writing to the rule sets file.
+        /// </exception>
+        /// <exception cref="System.Security.SecurityException">
+        /// We do not have the required permissions to create the rule sets file.
+        /// </exception>
+        /// <exception cref="UnauthorizedAccessException">
+        /// We are not permitted to write to a file on the rule sets file path.
+        /// </exception>
         public void Add(RuleSet ruleSet)
         {
             ruleSets.Add(ruleSet);
             Save();
         }
 
-        /// <summary>Update one or more rule sets. Call this method after any rule set objects are modified to persist changes.</summary>
-        /// <exception cref="IOException">An error occurred when creating or writing to the rule sets file.</exception>
-        /// <exception cref="System.Security.SecurityException">We do not have the required permissions to create the rule sets file.</exception>
-        /// <exception cref="UnauthorizedAccessException">We are not permitted to write to a file on the rule sets file path.</exception>
+        /// <summary>
+        /// Update one or more rule sets. Call this method after any rule set objects are modified to persist changes.
+        /// </summary>
+        /// <exception cref="IOException">
+        /// An error occurred when creating or writing to the rule sets file.
+        /// </exception>
+        /// <exception cref="System.Security.SecurityException">
+        /// We do not have the required permissions to create the rule sets file.
+        /// </exception>
+        /// <exception cref="UnauthorizedAccessException">
+        /// We are not permitted to write to a file on the rule sets file path.
+        /// </exception>
         public void Update()
         {
             Save();
@@ -69,10 +83,18 @@ namespace AnticrastinateCore
         /// and the exception will then be re-thrown for the calling code to handle.
         /// </summary>
         /// <param name="ruleSet">The rule set to delete.</param>
-        /// <exception cref="InvalidOperationException">The specified rule set is not present in the repository.</exception>
-        /// <exception cref="IOException">An error occurred when creating or writing to the rule sets file.</exception>
-        /// <exception cref="System.Security.SecurityException">We do not have the required permissions to create the rule sets file.</exception>
-        /// <exception cref="UnauthorizedAccessException">We are not permitted to write to a file on the rule sets file path.</exception>
+        /// <exception cref="InvalidOperationException">
+        /// The specified rule set is not present in the repository.
+        /// </exception>
+        /// <exception cref="IOException">
+        /// An error occurred when creating or writing to the rule sets file.
+        /// </exception>
+        /// <exception cref="System.Security.SecurityException">
+        /// We do not have the required permissions to create the rule sets file.
+        /// </exception>
+        /// <exception cref="UnauthorizedAccessException">
+        /// We are not permitted to write to a file on the rule sets file path.
+        /// </exception>
         public void Delete(RuleSet ruleSet)
         {
             var numRuleSets = ruleSets.Count;
@@ -110,18 +132,22 @@ namespace AnticrastinateCore
         /// <exception cref="DirectoryNotFoundException">The rule sets file directory was not found.</exception>
         /// <exception cref="IOException">An IO error occurred when reading from the rule sets file.</exception>
         /// <exception cref="System.Xml.XmlException">An error occurred while parsing the rule sets file.</exception>
-        /// <exception cref="System.Security.SecurityException">We do not have the required permissions to read from the rule sets file.</exception>
-        /// <exception cref="UnauthorizedAccessException">We are not permitted to read from a file on the rule sets file path.</exception>
+        /// <exception cref="System.Security.SecurityException">
+        /// We do not have the required permissions to read from the rule sets file.
+        /// </exception>
+        /// <exception cref="UnauthorizedAccessException">
+        /// We are not permitted to read from a file on the rule sets file path.
+        /// </exception>
         public void Load()
         {
             var root = XElement.Load(filePath).Element("RuleSets");
-            if (root == null) 
+            if (root == null)
                 return;
 
             var ruleSetEls = root.Elements(RuleSet);
             foreach (var ruleSetEl in ruleSetEls)
             {
-                String name = (string)ruleSetEl.Attribute(RuleSetName);
+                string name = (string)ruleSetEl.Attribute(RuleSetName);
 
                 bool blockAllWebsites; // default to false if attribute isn't present/readable
                 bool.TryParse((string)ruleSetEl.Attribute(BlockAllWebsites), out blockAllWebsites);
@@ -180,8 +206,12 @@ namespace AnticrastinateCore
 
         /// <summary>Saves the RuleSets to disk.</summary>
         /// <exception cref="IOException">An IO error occurred when creating or writing to the file.</exception>
-        /// <exception cref="System.Security.SecurityException">We do not have the required permissions to create the file.</exception>
-        /// <exception cref="UnauthorizedAccessException">We are not permitted to write to a file on this path.</exception>
+        /// <exception cref="System.Security.SecurityException">
+        /// We do not have the required permissions to create the file.
+        /// </exception>
+        /// <exception cref="UnauthorizedAccessException">
+        /// We are not permitted to write to a file on this path.
+        /// </exception>
         /// Further exceptions may be raised if the file path is of an invalid format.
         private void Save()
         {

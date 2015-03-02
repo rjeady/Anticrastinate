@@ -1,21 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace AnticrastinateCore
 {
     /// <summary>
     /// Represents a set of rules about which websites and programs to block or allow.
     /// </summary>
-    class RuleSet
+    internal class RuleSet
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="RuleSet"/> class.
-        /// </summary>
-        /// <param name="name">The RuleSet name.</param>
-        /// <param name="blockedPrograms">The blocked program rules.</param>
-        /// <param name="allowedWebsites">The allowed website rules.</param>
-        /// <param name="blockedWebsites">The blocked website rules.</param>
+        /// <summary>Initializes a new instance of the <see cref="RuleSet" /> class.</summary>
+        /// <param name="name">The rule set name.</param>
+        /// <param name="blockedPrograms">A list of blocked program rules.</param>
+        /// <param name="allowedWebsites">A list of allowed website rules.</param>
+        /// <param name="blockedWebsites">A list of blocked website rules.</param>
         public RuleSet(string name, IList<ProgramRule> blockedPrograms,
             IList<WebsiteRule> allowedWebsites, IList<WebsiteRule> blockedWebsites)
         {
@@ -28,7 +25,7 @@ namespace AnticrastinateCore
         /// <summary>
         /// Initializes a new instance of the <see cref="RuleSet"/> class, with all websites blocked.
         /// </summary>
-        /// <param name="name"></param>
+        /// <param name="name">The rule set name.</param>
         /// <param name="blockedPrograms">The blocked program rules.</param>
         public RuleSet(string name, IList<ProgramRule> blockedPrograms)
         {
