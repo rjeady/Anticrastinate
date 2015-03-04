@@ -1,9 +1,27 @@
 ﻿using System;
+using System.Diagnostics.Contracts;
 
 namespace AnticrastinateCore
 {
     class ProgramRule : IEquatable<ProgramRule>
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ProgramRule"/> class.
+        /// </summary>
+        /// <param name="name">The file name of the executable.</param>
+        /// <param name="path">
+        /// The path to the executable,
+        /// or an empty string if all programs of the same name are to be blocked.
+        /// </param>
+        public ProgramRule(string name, string path)
+        {
+            Contract.Requires(name != null);
+            Contract.Requires(path != null);
+
+            Name = name;
+            Path = path;
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ProgramRule"/> class.
         /// </summary>
@@ -13,7 +31,7 @@ namespace AnticrastinateCore
         /// </param>
         public ProgramRule(string path)
         {
-            if (path == null) throw new ArgumentNullException("path");
+            Contract.Requires(path != null);
 
             int finalSlashPos = path.LastIndexOf(System.IO.Path.DirectorySeparatorChar);
             if (finalSlashPos == -1)
@@ -30,31 +48,14 @@ namespace AnticrastinateCore
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ProgramRule"/> class.
-        /// </summary>
-        /// <param name="name">The file name of the executable.</param>
-        /// <param name="path">
-        /// The path to the executable,
-        /// or an empty string if all programs of the same name are to be blocked.
-        /// </param>
-        public ProgramRule(string name, string path)
-        {
-            if (name == null) throw new ArgumentNullException("name");
-            if (path == null) throw new ArgumentNullException("path");
-
-            Name = name;
-            Path = path;
-        }
-
-        /// <summary>
         /// The name of the program executable, including the file extension.
         /// </summary>
-        public String Name { get; private set; }
+        public string Name { get; private set; }
 
         /// <summary>
         /// The complete file path of the program. May be null if all programs of the same name are to be blocked.
         /// </summary>
-        public String Path { get; private set; }
+        public string Path { get; private set; }
 
         #region Value Equality Members
         

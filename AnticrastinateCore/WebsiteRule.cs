@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.Contracts;
 
 namespace AnticrastinateCore
 {
@@ -14,9 +15,9 @@ namespace AnticrastinateCore
         /// </exception>
         public WebsiteRule(string host, string path)
         {   
-            if (host == null) throw new ArgumentNullException("host");
-            if (path == null) throw new ArgumentNullException("path");
-                 
+            Contract.Requires(host != null);
+            Contract.Requires(path != null);
+
             Host = host;
             Path = path;
         }
