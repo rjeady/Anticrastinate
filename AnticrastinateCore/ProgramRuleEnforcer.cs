@@ -1,4 +1,9 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.Linq;
+using System.Threading;
 using Microsoft.Win32;
 
 namespace AnticrastinateCore
@@ -7,12 +12,15 @@ namespace AnticrastinateCore
     /// Enforces program RuleSets, using the registry to block programs,
     /// by launching our specified executable as a 'debugger' instead.
     /// </summary>
-    class ProgramRuleEnforcer
+    internal class ProgramRuleEnforcer
     {
         private const string RootKeyPath = @"SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options";
         private const string BlockingKeyName = "Debugger";
         // TODO: obtain correct path to program blocker executable.
         private const string BlockingKeyValue = @"C:\ProgramBlocker.exe";
+
+        private const int CloseProgramTimeMs = 20 * 1000;
+        private Timer killProgramsTimer;
 
         private RuleSet ruleSet;
 
@@ -26,36 +34,97 @@ namespace AnticrastinateCore
             get { return ruleSet; }
             set
             {
-                if (ruleSet != value)
-                {
-                    // unblock programs that are only in the old RuleSet
-                    foreach (var program in ruleSet.BlockedPrograms.Except(value.BlockedPrograms))
-                        Unblock(program);
+                if (ruleSet == value)
+                    return;
 
-                    // block programs that are only in the new RuleSet
-                    foreach (var program in value.BlockedPrograms.Except(ruleSet.BlockedPrograms))
-                        Block(program);
+                // unblock programs that are only blocked in the old RuleSet
+                foreach (var program in ruleSet.BlockedPrograms.Except(value.BlockedPrograms))
+                    Unblock(program);
 
-                    ruleSet = value;
-                }
+                // block programs that are only blocked in the new RuleSet
+                BlockPrograms(value.BlockedPrograms.Except(ruleSet.BlockedPrograms));
+
+                ruleSet = value;
             }
         }
 
-        /// <summary>
-        /// Blocks the specified program.
-        /// </summary>
-        /// <param name="program">The program rule.</param>
-        private void Block(ProgramRule program)
+        private void BlockPrograms(IEnumerable<ProgramRule> newlyBlockedPrograms)
         {
-            var baseKey = Registry.LocalMachine.OpenSubKey(RootKeyPath, true);
+            var processesToKill = new List<Process>();
 
-            // will open sub-key if it already exists
-            var programKey = baseKey.CreateSubKey(program.Name);
-            programKey.SetValue(BlockingKeyName, BlockingKeyValue);
+            foreach (var program in newlyBlockedPrograms)
+            {
+                BlockInRegistry(program);
 
-            // TODO: handle failures cases -
-            // Image File Exceution Options key couldn't be opened,
-            // or program key couldn't be created.
+                Process[] procs = Process.GetProcessesByName(program.NameWithoutExtension);
+                foreach (var proc in procs)
+                {
+                    try
+                    {
+                        // ask it to close nicely
+                        proc.CloseMainWindow();
+                        // may need to be killed
+                        processesToKill.Add(proc);
+                    }
+                    catch (InvalidOperationException)
+                    {
+                        // process has already exited. Dispose the process object.
+                        proc.Close();
+                    }
+                }
+            }
+
+            // give user a certain amount of time to close programs, then kill them.
+            // first dipose of any existing timer - i.e. cancel any pending program kill operation
+            if (killProgramsTimer != null)
+                killProgramsTimer.Dispose();
+            killProgramsTimer = new Timer(KillPrograms, processesToKill, CloseProgramTimeMs, Timeout.Infinite);
+        }
+
+        private void BlockInRegistry(ProgramRule program)
+        {
+            using (RegistryKey baseKey = Registry.LocalMachine.OpenSubKey(RootKeyPath, true))
+            using (RegistryKey programKey = baseKey.CreateSubKey(program.Name))
+            {
+                // this will have opened the program sub-key instead if it already exists
+                programKey.SetValue(BlockingKeyName, BlockingKeyValue);
+            }
+
+            // TODO: handle failures cases:
+            // - Image File Exceution Options key couldn't be opened
+            // - program key couldn't be created
+        }
+
+        private void KillPrograms(object processes)
+        {
+            foreach (var process in (List<Process>)processes)
+            {
+                try
+                {
+                    if (!process.HasExited)
+                        process.Kill();
+                }
+                catch (InvalidOperationException)
+                {
+                    // process has already exited, so do nothing.
+                }
+                catch (NotSupportedException)
+                {
+                    // we don't want to kill remote processes anyway.
+                }
+                catch (Win32Exception)
+                {
+                    // - process is already terminating (good),
+                    // - or its exit code couldn't be retrieved in the HasExited call [huh? we didn't ask for the exit
+                    //   code! Still hopefully that means it has exited/is exiting],
+                    // - or process is a win16 exe / could not be terminated (nothing we can do).
+                }
+                finally
+                {
+                    // Dispose the process object.
+                    process.Close();
+                }
+            }
         }
 
         /// <summary>
@@ -77,6 +146,5 @@ namespace AnticrastinateCore
             // TODO: handle failures case -
             // Image File Exceution Options key couldn't be opened.
         }
-
     }
 }
