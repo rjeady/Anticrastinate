@@ -5,10 +5,10 @@ namespace AnticrastinateCore.Commons
 {
     class CountdownTimer
     {
-        Timer timer;
+        private readonly Timer timer;
 
         private DateTime startTime;
-        private double totalDuration;
+        private readonly double totalDuration;
 
         public event EventHandler<ElapsedEventArgs> Elapsed;
 
