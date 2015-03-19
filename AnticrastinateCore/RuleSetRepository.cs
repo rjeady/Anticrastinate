@@ -31,7 +31,6 @@ namespace AnticrastinateCore
         private const string WebsiteRule = "WebsiteRule";
 
         private const string ProgramName = "Name";
-        private const string ProgramPath = "Path";
 
         private const string WebsiteHost = "Host";
         private const string WebsitePath = "Path";
@@ -113,7 +112,7 @@ namespace AnticrastinateCore
                     {
                         if (ex is IOException || ex is UnauthorizedAccessException || ex is SecurityException)
                         {
-                            // if the save operation fails for an expected reason, rollback our delete operation.
+                            // if the save operation fails for a foreseen reason, rollback our delete operation.
                             ruleSets.Insert(i, ruleSet);
                         }
                         // now re-throw the exception.
@@ -184,10 +183,9 @@ namespace AnticrastinateCore
         private static ProgramRule ProgramRuleFromXElement(XElement x)
         {
             var name = (string)x.Attribute(ProgramName);
-            var path = (string)x.Attribute(ProgramPath) ?? string.Empty;
 
             if (name != null)
-                return new ProgramRule(name, path);
+                return new ProgramRule(name);
             else
                 return null;
         }
@@ -232,8 +230,7 @@ namespace AnticrastinateCore
         /// <param name="rule">The program rule.</param>
         private static XElement XElementFromProgramRule(ProgramRule rule)
         {
-            return new XElement(ProgramRule, new XAttribute(ProgramName, rule.Name),
-                new XAttribute(ProgramPath, rule.Path));
+            return new XElement(ProgramRule, new XAttribute(ProgramName, rule.Name));
         }
 
         /// <summary>Creates an XElement for the specified website rule.</summary>
