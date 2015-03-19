@@ -28,7 +28,7 @@ namespace WpfTesting
 
             Closing += (s, e) =>
             {
-                e.Cancel = true;
+                // e.Cancel = true;
                 label.Content = "no cleaning up, oh no we don't";
             };
         }
