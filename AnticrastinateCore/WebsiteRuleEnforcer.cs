@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Text;
 using Fiddler;
@@ -9,13 +10,15 @@ namespace AnticrastinateCore
     internal class WebsiteRuleEnforcer
     {
         private const int FiddlerPort = 14823;
-        private const FiddlerCoreStartupFlags FiddlerFlags = 
-            FiddlerCoreStartupFlags.CaptureLocalhostTraffic |
-            FiddlerCoreStartupFlags.MonitorAllConnections |
-            FiddlerCoreStartupFlags.RegisterAsSystemProxy;
+
+        private const FiddlerCoreStartupFlags FiddlerFlags
+            = FiddlerCoreStartupFlags.MonitorAllConnections
+            | FiddlerCoreStartupFlags.RegisterAsSystemProxy
+            | FiddlerCoreStartupFlags.OptimizeThreadPool
+            | FiddlerCoreStartupFlags.ChainToUpstreamGateway;
 
         private RuleSet ruleSet;
-        private bool anythingBlocked;
+        private bool isAnythingBlocked;
 
         public WebsiteRuleEnforcer(RuleSet ruleSet)
         {
@@ -32,20 +35,20 @@ namespace AnticrastinateCore
                 if (ruleSet != value)
                 {
                     ruleSet = value;
-                    AnythingBlocked = ruleSet.BlockedWebsites.Any();
+                    IsAnythingBlocked = ruleSet.BlockedWebsites.Any();
                 }
             }
         }
 
-        private bool AnythingBlocked
+        private bool IsAnythingBlocked
         {
             set
             {
-                if (!anythingBlocked && value)
+                if (!isAnythingBlocked && value)
                     FiddlerApplication.BeforeRequest += HandleFiddlerBeforeRequest;
-                else if (anythingBlocked && !value)
+                else if (isAnythingBlocked && !value)
                     FiddlerApplication.BeforeRequest -= HandleFiddlerBeforeRequest;
-                anythingBlocked = value;
+                isAnythingBlocked = value;
             }
         }
 
@@ -80,6 +83,9 @@ namespace AnticrastinateCore
         /// <returns></returns>
         private bool MatchWebsite(String hostName, String path, IEnumerable<WebsiteRule> rules)
         {
+            // valid since Session.hostname property is never null.
+            Contract.Requires(hostName != null);
+
             // TODO: compare performance to using AsParallel()
             foreach (var rule in rules)
             {

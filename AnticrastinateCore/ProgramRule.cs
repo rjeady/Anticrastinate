@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics.Contracts;
+using System.IO;
 
 namespace AnticrastinateCore
 {
@@ -25,7 +26,7 @@ namespace AnticrastinateCore
         /// </summary>
         public string NameWithoutExtension
         {
-            get { return Name.Substring(0, Name.LastIndexOf('.')); }
+            get { return Path.GetFileNameWithoutExtension(Name); }
         }
 
         #region Value Equality Members
