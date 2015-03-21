@@ -19,9 +19,8 @@ namespace AnticrastinateCore
         // TODO: obtain correct path to program blocker executable.
         private const string BlockingKeyValue = @"C:\ProgramBlocker.exe";
 
-        private const int CloseProgramTimeMs = 20 * 1000;
-        private Timer killProgramsTimer;
-
+        private ProcessCloser processCloser;
+        
         private RuleSet ruleSet;
 
         public ProgramRuleEnforcer(RuleSet existingRuleSet)
@@ -37,50 +36,28 @@ namespace AnticrastinateCore
                 if (ruleSet == value)
                     return;
 
+                processCloser.Abort();
+
                 // unblock programs that are only blocked in the old RuleSet
                 foreach (var program in ruleSet.BlockedPrograms.Except(value.BlockedPrograms))
                     Unblock(program);
 
                 // block programs that are only blocked in the new RuleSet
-                BlockPrograms(value.BlockedPrograms.Except(ruleSet.BlockedPrograms));
+                List<ProgramRule> newlyBlockedPrograms = value.BlockedPrograms.Except(ruleSet.BlockedPrograms).ToList();
+                
+                foreach (var program in newlyBlockedPrograms)
+                    BlockInRegistry(program);
+
+                processCloser = new ProcessCloser(newlyBlockedPrograms);
 
                 ruleSet = value;
             }
         }
 
-        private void BlockPrograms(IEnumerable<ProgramRule> newlyBlockedPrograms)
-        {
-            var processesToKill = new List<Process>();
-
-            foreach (var program in newlyBlockedPrograms)
-            {
-                BlockInRegistry(program);
-
-                Process[] procs = Process.GetProcessesByName(program.NameWithoutExtension);
-                foreach (var proc in procs)
-                {
-                    try
-                    {
-                        // ask it to close nicely
-                        proc.CloseMainWindow();
-                        // may need to be killed
-                        processesToKill.Add(proc);
-                    }
-                    catch (InvalidOperationException)
-                    {
-                        // process has already exited. Dispose the process object.
-                        proc.Close();
-                    }
-                }
-            }
-
-            // give user a certain amount of time to close programs, then kill them.
-            // first dipose of any existing timer - i.e. cancel any pending program kill operation
-            if (killProgramsTimer != null)
-                killProgramsTimer.Dispose();
-            killProgramsTimer = new Timer(KillPrograms, processesToKill, CloseProgramTimeMs, Timeout.Infinite);
-        }
-
+        /// <summary>
+        /// Blocks the specified program in the registry.
+        /// </summary>
+        /// <param name="program">The program rule.</param>
         private void BlockInRegistry(ProgramRule program)
         {
             using (RegistryKey baseKey = Registry.LocalMachine.OpenSubKey(RootKeyPath, true))
@@ -95,40 +72,8 @@ namespace AnticrastinateCore
             // - program key couldn't be created
         }
 
-        private void KillPrograms(object processes)
-        {
-            foreach (var process in (List<Process>)processes)
-            {
-                try
-                {
-                    if (!process.HasExited)
-                        process.Kill();
-                }
-                catch (InvalidOperationException)
-                {
-                    // process has already exited, so do nothing.
-                }
-                catch (NotSupportedException)
-                {
-                    // we don't want to kill remote processes anyway.
-                }
-                catch (Win32Exception)
-                {
-                    // - process is already terminating (good),
-                    // - or its exit code couldn't be retrieved in the HasExited call [huh? we didn't ask for the exit
-                    //   code! Still hopefully that means it has exited/is exiting],
-                    // - or process is a win16 exe / could not be terminated (nothing we can do).
-                }
-                finally
-                {
-                    // Dispose the process object.
-                    process.Close();
-                }
-            }
-        }
-
         /// <summary>
-        /// Unblocks the specified program.
+        /// Unblocks the specified program in the registry.
         /// </summary>
         /// <param name="program">The program rule.</param>
         private void Unblock(ProgramRule program)
@@ -145,6 +90,116 @@ namespace AnticrastinateCore
 
             // TODO: handle failures case -
             // Image File Exceution Options key couldn't be opened.
+        }
+
+
+        private class ProcessCloser
+        {
+            // time delay between asking user to close programs and asking the processes to close ourselves.
+            private const int CloseProcessesDelayMs = 20 * 1000;
+            // time delay between asking the processes to close and killing them.
+            private const int KillProcessesDelayMs = 20 * 1000;
+
+            private Timer closeProcessesTimer;
+            private Timer killProcessesTimer;
+            private volatile bool abort;
+
+            private readonly List<Process> processes = new List<Process>(); 
+
+            public ProcessCloser(IEnumerable<ProgramRule> newlyBlockedPrograms)
+            {
+                AskUserToClose(newlyBlockedPrograms);
+            }
+
+            public void Abort()
+            {
+                abort = true;
+                // it is possible that the AskUserToClose or CloseProcesses methods could instantiate these timers
+                // after we try to dispose of them, but they will be disposed of when the timer callback occurs anyway.
+                if (closeProcessesTimer != null)
+                    closeProcessesTimer.Dispose();
+                if (killProcessesTimer != null)
+                    killProcessesTimer.Dispose();
+            }
+
+            private void AskUserToClose(IEnumerable<ProgramRule> programRules)
+            {
+                var processesToClose = new List<Process>();
+
+                foreach (var program in programRules)
+                {
+                    Process[] procs = Process.GetProcessesByName(program.NameWithoutExtension);
+                    if (procs.Length > 0)
+                    {
+                        // TODO: ask user to close this program.
+                        processesToClose.AddRange(procs);
+                    }
+                }
+                // schedule the CloseProcesses method giving the user some time to close the programs themselves.
+                if (!abort)
+                    closeProcessesTimer = new Timer(CloseProcesses, processesToClose, CloseProcessesDelayMs, Timeout.Infinite);
+            }
+            
+            private void CloseProcesses(object state)
+            {
+                closeProcessesTimer.Dispose();
+
+                if (abort)
+                    return;
+
+                for (int i = 0; i < processes.Count; i++)
+                {
+                    try
+                    {
+                        // ask it to close nicely
+                        processes[i].CloseMainWindow();
+                    }
+                    catch (InvalidOperationException)
+                    {
+                        // process has already closed. Dispose the process object and mark it for removal from our list.
+                        processes[i].Dispose();
+                        processes[i] = null;
+                    }
+                }
+
+                // remove disposed processes from the kill list all at once.
+                // this is more efficient than deleting the processes one at a time from the list.
+                processes.RemoveAll(x => x == null);
+
+                if (!abort)
+                    killProcessesTimer = new Timer(KillProcesses, processes, KillProcessesDelayMs, Timeout.Infinite);
+            }
+
+            private void KillProcesses(object state)
+            {
+                killProcessesTimer.Dispose();
+
+                if (abort)
+                    return;
+
+                foreach (Process process in processes)
+                {
+                    try
+                    {
+                        process.Kill();
+                    }
+                    catch (InvalidOperationException)
+                    {
+                        // process has already exited, so do nothing.
+                    }
+                    catch (Win32Exception)
+                    {
+                        // - process is already terminating (good),
+                        // - or process is a win16 exe / could not be terminated (nothing we can do).
+                    }
+                    // no need to catch NotSupportedException, since we won't be trying to kill remote processes.
+                    finally
+                    {
+                        // Dispose the process object.
+                        process.Dispose();
+                    }
+                }
+            }
         }
     }
 }
