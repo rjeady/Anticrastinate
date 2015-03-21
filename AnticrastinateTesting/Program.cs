@@ -1,15 +1,21 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using AnticrastinateCore;
 
 namespace AnticrastinateTesting
 {
-    class Program
+    static class Program
     {
+        [STAThread]
         static void Main(string[] args)
         {
+            Console.WriteLine("Here are the files:");
+            Console.WriteLine();
+
+            foreach (var program in ProgramFinder.GetPrograms())
+            {
+                Console.WriteLine("name: {0}, path: {1}, icon: {2}", program.Name, program.FilePath, program.IconPath);   
+            }
+            Console.ReadLine();
         }
     }
 }

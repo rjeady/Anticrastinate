@@ -32,7 +32,7 @@ namespace FiddlerTesting
 
             // Fiddler.FiddlerApplication.OnNotification += delegate(object sender, NotificationEventArgs oNEA) { Console.WriteLine("** NotifyUser: " + oNEA.NotifyString); };
             // Fiddler.FiddlerApplication.Log.OnLogString += delegate(object sender, LogEventArgs oLEA) { Console.WriteLine("** LogString: " + oLEA.LogString); };
-            FiddlerApplication.BeforeRequest += HandlerFiddlerBeforeRequest;
+            FiddlerApplication.BeforeRequest += HandleFiddlerBeforeRequest;
 
             var flags = FiddlerCoreStartupFlags.MonitorAllConnections |
                         FiddlerCoreStartupFlags.RegisterAsSystemProxy |
@@ -49,7 +49,7 @@ namespace FiddlerTesting
             
         }
 
-        private static void HandlerFiddlerBeforeRequest(Session s)
+        private static void HandleFiddlerBeforeRequest(Session s)
         {
             if (s.fullUrl.Contains("flag"))
             {
