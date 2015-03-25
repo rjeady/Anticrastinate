@@ -9,9 +9,9 @@ namespace ProgramBlocker
 		{
 			Application.EnableVisualStyles();
 
-			if (args.Length == 1 && args[0].EndsWith(".exe"))
+			if (args.Length == 1)
 			{
-				MessageBox.Show(string.Format("Anticrastinate is currently blocking {0} \nShouldn't you be working?", args[0].Split('\\').Last()),
+				MessageBox.Show(string.Format("Anticrastinate is currently blocking\n{0}\nShouldn't you be working?", args[0]),
 					"Program Blocked", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
 		}
