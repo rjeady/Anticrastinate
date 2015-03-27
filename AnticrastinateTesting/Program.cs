@@ -13,8 +13,10 @@ namespace AnticrastinateTesting
 
             foreach (var program in ProgramFinder.GetPrograms())
             {
-                Console.WriteLine("name: {0}, path: {1}, icon: {2}", program.Name, program.FilePath, program.IconPath);   
+                Console.WriteLine("name: {0}, path: {1}, icon: {2}", program.Name, program.FilePath, program.Icon);
             }
+
+
             Console.ReadLine();
         }
     }

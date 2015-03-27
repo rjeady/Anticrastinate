@@ -84,6 +84,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -94,6 +95,7 @@
     <Compile Include="BreakTimingRuleCoordinator.cs" />
     <Compile Include="Commons\EventExtensions.cs" />
     <Compile Include="Commons\CountdownTimer.cs" />
+    <Compile Include="Program.cs" />
     <Compile Include="ProgramFinder.cs" />
     <Compile Include="ProgramRule.cs" />
     <Compile Include="ProgramRuleEnforcer.cs" />
